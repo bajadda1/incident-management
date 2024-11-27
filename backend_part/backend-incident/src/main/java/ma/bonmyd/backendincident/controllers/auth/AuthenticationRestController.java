@@ -2,6 +2,7 @@ package ma.bonmyd.backendincident.controllers.auth;
 
 
 import lombok.AllArgsConstructor;
+import ma.bonmyd.backendincident.dtos.users.JwtDTO;
 import ma.bonmyd.backendincident.dtos.users.UserLoginDTO;
 import ma.bonmyd.backendincident.dtos.users.UserRegisterDTO;
 import ma.bonmyd.backendincident.entities.users.User;
@@ -18,9 +19,8 @@ public class AuthenticationRestController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
-        String token = this.authenticationService.loginUser(userLoginDTO);
-        return ResponseEntity.ok(token);
+    public JwtDTO login(@RequestBody UserLoginDTO userLoginDTO) {
+        return this.authenticationService.loginUser(userLoginDTO);
     }
 
     @PostMapping("/register")

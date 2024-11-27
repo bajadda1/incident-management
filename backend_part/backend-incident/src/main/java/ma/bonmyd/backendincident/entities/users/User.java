@@ -1,11 +1,9 @@
 package ma.bonmyd.backendincident.entities.users;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ma.bonmyd.backendincident.entities.incident.Sector;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,20 +18,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Data
+//@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "_users")
 @EntityListeners(AuditingEntityListener.class)
+
+@Getter
+@Setter
+//@ToString(exclude = {"role", "sector"})
+
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String fullname;
     //email unique !
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Column(name = "email",unique = true, nullable = false)
+    private String username;
     private String password;
     //enable professional acc or not
     private boolean enabled;
@@ -45,6 +48,7 @@ public class User implements UserDetails {
     @Column(insertable = false)
     private LocalDateTime lastModifiedAt;
     @ManyToOne(cascade = CascadeType.ALL) // Or CascadeType.ALL if appropriate
+//    @JsonIgnore // Éviter la sérialisation dans les API REST
     @JoinColumn(name = "role_id")
     private Role role;
     //sector for professional
@@ -63,8 +67,9 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
@@ -83,7 +88,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
 }

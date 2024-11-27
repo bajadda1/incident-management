@@ -14,9 +14,9 @@ import ma.bonmyd.backendincident.dtos.incident.SectorDTO;
 @Builder
 public class UserRegisterDTO {
     private Long id;
-    private String username;
+    private String fullname;
     //email unique !
-    private String email;
+    private String username;
     private String password;
     private RoleDTO roleDTO;
     private SectorDTO sectorDTO;
