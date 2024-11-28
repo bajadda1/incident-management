@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @RequiredArgsConstructor
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
@@ -42,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = this.jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // Log error and proceed without setting authentication
+            // Log error for debugging
+            System.err.println("Error extracting username from JWT: " + e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }

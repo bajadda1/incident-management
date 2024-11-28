@@ -2,10 +2,7 @@ package ma.bonmyd.backendincident.entities.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,12 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+//@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "roles")
 @EntityListeners(AuditingEntityListener.class)
+
+@Getter
+@Setter
+//@ToString(exclude = "users")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +34,6 @@ public class Role {
     private LocalDateTime lastModifiedAt;
 
     @OneToMany(mappedBy = "role")
+    @JsonIgnore
     private List<User> users;
 }

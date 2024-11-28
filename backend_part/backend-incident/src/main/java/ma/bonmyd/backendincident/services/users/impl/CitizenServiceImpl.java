@@ -23,7 +23,8 @@ public class CitizenServiceImpl implements ICitizenService {
 
     @Override
     public Citizen findCitizenById(Long id) {
-        return this.citizenRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("citizen with id=%d not found", id)));
+        return this.citizenRepository.
+                findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("citizen with id=%d not found", id)));
 
     }
 

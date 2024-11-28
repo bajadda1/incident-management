@@ -73,12 +73,12 @@ public class TypeServiceImpl implements ITypeService {
 
     @Override
     public TypeDTO updateType(Long sectorId,TypeDTO typeDTO) {
-        Sector sector=this.sectorService.findSectorById(sectorId);
         Type existingType = this.findTypeByName(typeDTO.getName());
         if (existingType != null && !Objects.equals(existingType.getId(), typeDTO.getId())) {
             throw new ResourceAlreadyExistsException(
                     String.format("type with name=%s already exists", typeDTO.getName()));
         }
+        Sector sector=this.sectorService.findSectorById(sectorId);
         Type type = this.typeModelMapper.convertToEntity(typeDTO, Type.class);
         type.setSector(sector);
         type=this.typeRepository.save(type);

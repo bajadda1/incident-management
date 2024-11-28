@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,13 +25,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
-    //    @Value("${secret.signing.key}")
-    private String SECRET_KEY = "7A619C292814B3EDDD7E73FBE6D67";
-    //    @Value("${jwt.expiration.duration}")
-    private long JWT_EXPIRATION = 10000;
+    @Value("${secret.signing.key}")
+    private String SECRET_KEY;
+    @Value("${jwt.expiration.duration}")
+    private long JWT_EXPIRATION;
 
-    Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    String base64Key = Encoders.BASE64.encode(key.getEncoded());
+    //Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    //String base64Key = Encoders.BASE64.encode(key.getEncoded());
 
     public String extractUsername(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
@@ -92,12 +93,12 @@ public class JwtService {
         return this.extractClaim(token, Claims::getExpiration);
     }
 
-    //    private Key getSignInKey() {
+    //            private Key getSignInKey() {
 //        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
 //        return Keys.hmacShaKeyFor(keyBytes);
 //    }
     private SecretKey getSignInKey() {
-        byte[] bytes = Decoders.BASE64.decode(base64Key);
+        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(bytes);
     }
 }
