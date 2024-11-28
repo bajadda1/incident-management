@@ -81,6 +81,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(authApi + "/login").permitAll()
                                 .requestMatchers(authApi + "/register").permitAll()
+                                .requestMatchers(authApi + "/activate-account").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, sectorApi + "/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, sectorApi + "/**").hasAuthority("ADMIN")

@@ -25,7 +25,8 @@ public class Token {
     private Long id;
     private String token;
     private LocalDateTime createdAt;
-    private LocalDateTime lastModifiedAt;
+    private LocalDateTime expiresAt;
+    private LocalDateTime validatedAt;
     @ManyToOne()
     @JoinColumn(name = "user_id",nullable = false)
     private User user;

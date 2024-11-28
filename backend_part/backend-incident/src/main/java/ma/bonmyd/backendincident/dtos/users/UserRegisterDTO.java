@@ -20,5 +20,5 @@ public class UserRegisterDTO {
     private String password;
     private RoleDTO roleDTO;
     private SectorDTO sectorDTO;
-    private boolean enabled;
+//    private boolean enabled;
 }
