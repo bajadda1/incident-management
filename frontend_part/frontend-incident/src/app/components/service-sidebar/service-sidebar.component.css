@@ -1,0 +1,12 @@
+.sidebar-container {
+  position: relative;
+}
+
+#toggle-sidebar {
+  position: absolute;
+  left: 10px;
+}
+
+#sidebar-collapse-menu {
+  transition: all 0.3s ease;
+}

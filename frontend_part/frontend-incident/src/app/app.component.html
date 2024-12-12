@@ -1,0 +1,28 @@
+<!--<div class="relative">-->
+<!--&lt;!&ndash;  <div class="relative">&ndash;&gt;-->
+<!--&lt;!&ndash;    <app-nav-bar></app-nav-bar>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+<!--  <div class="relative flex flex-col">-->
+<!--    <div>-->
+<!--      <app-side-bar></app-side-bar>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--      <router-outlet></router-outlet>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+
+<div class="relative">
+  <app-nav-bar></app-nav-bar>
+  <app-spinner></app-spinner>
+
+  <div class="relative"
+       [ngClass]="{'lg:px-20':!hideNavAndFooter}">
+    <router-outlet></router-outlet>
+  </div>
+
+  <app-footer></app-footer>
+</div>
+
+

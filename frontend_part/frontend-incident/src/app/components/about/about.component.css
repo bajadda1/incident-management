@@ -1,0 +1,20 @@
+.accordion {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.toggle-button {
+  cursor: pointer;
+}
+
+.toggle-button svg {
+  transition: transform 0.3s ease-in-out;
+}
+
+.toggle-button svg.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.content {
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
