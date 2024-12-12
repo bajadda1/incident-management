@@ -40,65 +40,56 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message("Validation failed")
-                .description(errorMessage.toString())
+//                .description(errorMessage.toString())
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     // Handle ResourceNotFoundException
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.builder()
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .message("Resource Not Found")
-                .description(ex.getMessage())
+                .message(ex.getMessage())
                 .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     // Handle ResourceAlreadyExistsException
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(
+    public ErrorResponse handleResourceAlreadyExistsException(
             ResourceAlreadyExistsException ex, WebRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.builder()
+
+        return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.CONFLICT.value()) // 409
-                .message("Resource Already Exists")
-                .description(ex.getMessage())
+                .message(ex.getMessage())
                 .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     // Handle MethodArgumentTypeMismatchException (invalid argument type)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+    public ErrorResponse handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
         String message = String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
                 ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
+        return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.BAD_REQUEST.value()) // 400
-                .message("Bad Request")
-                .description(message)
+                .message(message)
                 .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     // Handle general exceptions (Fallback for any other uncaught exceptions)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.builder()
+    public ErrorResponse handleAllExceptions(Exception ex, WebRequest request) {
+
+        return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value()) // 500
-                .message("Internal Server Error")
-                .description(ex.getMessage())
+                .message(ex.getMessage())
                 .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

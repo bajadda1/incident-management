@@ -3,6 +3,7 @@ package ma.bonmyd.backendincident.entities.territoriale;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.Immutable;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.WKTReader;
@@ -13,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "regions")
 @Data
+
 public class Region {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

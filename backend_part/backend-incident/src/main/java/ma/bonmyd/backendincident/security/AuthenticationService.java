@@ -30,7 +30,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class AuthenticationService {
 
 
     private final IModelMapper<User, UserRegisterDTO> userUserRegisterModelMapper;
+    private final IModelMapper<User, UserResponseDTO> userUserResponseModelMapper;
     private final IModelMapper<Sector, SectorDTO> sectorModelMapper;
     private final IModelMapper<Role, RoleDTO> roleModelMapper;
 
@@ -63,23 +66,80 @@ public class AuthenticationService {
         }
         User user = this.userUserRegisterModelMapper.convertToEntity(userRegisterDTO, User.class);
 
-        Role role = this.roleModelMapper.convertToEntity(userRegisterDTO.getRoleDTO(), Role.class);
+//      Role role = this.roleRepository.findById(userRegisterDTO.getRoleDTO().getId()).orElseThrow(() -> new ResourceNotFoundException("not found"));
+        Role role = this.roleRepository.findByRole("professional".toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("not found"));
+//                this.roleModelMapper.convertToEntity(userRegisterDTO.getRoleDTO(), Role.class);
         user.setRole(role);
 
-        Sector sector = this.sectorModelMapper.convertToEntity(userRegisterDTO.getSectorDTO(), Sector.class);
+        Sector sector = this.sectorRepository.findById(userRegisterDTO.getSectorDTO().getId()).orElseThrow(() -> new ResourceNotFoundException("not found"));
+//                this.sectorModelMapper.convertToEntity(userRegisterDTO.getSectorDTO(), Sector.class);
         user.setSector(sector);
 
 
         user.setPassword(this.passwordEncoder.encode(userRegisterDTO.getPassword()));
 
-        //by default
-        user.setEnabled(false);
+        //by default enable admin
+        user.setEnabled(user.getRole().getRole().equalsIgnoreCase("admin"));
+
+
         user = this.userRepository.save(user);
 
         //send a validation email
-        this.sendEmailValidation(user);
+//        this.sendEmailValidation(user);
 
         return this.userUserRegisterModelMapper.convertToDto(user, UserRegisterDTO.class);
+    }
+
+
+    public JwtDTO loginUser(UserLoginDTO userLoginDTO) {
+        Authentication auth = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userLoginDTO.getUsername(),
+                userLoginDTO.getPassword()
+        ));
+
+        System.out.println(auth.getAuthorities());
+        if (auth == null) {
+            System.out.println("??????????|||||||||||| NULL NULL");
+            throw new RuntimeException("user mail or pass not correct");
+        }
+        User user = (User) auth.getPrincipal();
+
+        if (!user.isEnabled()) {
+            throw new RuntimeException("user not  enabled yet,try to activate your account");
+        }
+        return JwtDTO
+                .builder()
+                // Generate the JWT
+                .jwt(jwtService.generateToken(Map.of("fullname", user.getFullname()), user))
+                .build();
+    }
+
+
+    //TODO : email verification
+    public String activateAccount(ActivationCodeDTO activationCodeDTO) throws MessagingException {
+        String activationCode = activationCodeDTO.getActivationCode();
+        Token token = this.tokenRepository.findByToken(activationCode).orElseThrow(
+                () -> new ResourceNotFoundException("invalid activation code")
+        );
+
+        //check if the code activation has expired?
+
+        if (LocalDateTime.now().isAfter(token.getExpiresAt())) {
+            //resend the activation code mail
+            this.sendEmailValidation(token.getUser());
+
+            return "activation code has been expired, a new one has been sent to the same email, check and try agin!";
+        }
+
+        User user = token.getUser();
+
+        //after code activation check ,set  the user enabled to true
+        user.setEnabled(true);
+
+        token.setValidatedAt(LocalDateTime.now());
+        this.tokenRepository.save(token);
+        return "account activation is done successfully";
+
     }
 
     private void sendEmailValidation(User user) throws MessagingException {
@@ -124,76 +184,5 @@ public class AuthenticationService {
         return codeBuilder.toString();
     }
 
-    public JwtDTO loginUser(UserLoginDTO userLoginDTO) {
-        // Fetch the user by email
-//        User user = userRepository.findByUsername(userLoginDTO.getUsername())
-//                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-//
-//        // Check if the password matches
-//        if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
-//            throw new RuntimeException("Invalid email or password");
-//        }
-//
-//        if (!user.isEnabled()) {
-//            throw new RuntimeException("user not  enabled yet");
-//        }
-
-        Authentication auth = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                userLoginDTO.getUsername(),
-                userLoginDTO.getPassword()
-        ));
-
-        User user = (User) auth.getPrincipal();
-
-        if (!user.isEnabled()) {
-            throw new RuntimeException("user not  enabled yet,try to activate your account");
-        }
-        return JwtDTO
-                .builder()
-                // Generate the JWT
-                .jwt(jwtService.generateToken(Map.of("fullname", user.getFullname()), user))
-                .build();
-    }
-
-    public UserRegisterDTO getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(SecurityContextHolder.getContext().getAuthentication());
-
-        if (principal instanceof UserDetails) {
-            String username = ((UserDetails) principal).getUsername();
-            // Fetch the user from the database if needed
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-            return this.userUserRegisterModelMapper.convertToDto(user, UserRegisterDTO.class);
-        } else {
-            throw new RuntimeException("No authenticated user");
-        }
-    }
-
-    public String activateAccount(ActivationCodeDTO activationCodeDTO) throws MessagingException {
-        String activationCode = activationCodeDTO.getActivationCode();
-        Token token = this.tokenRepository.findByToken(activationCode).orElseThrow(
-                () -> new ResourceNotFoundException("invalid activation code")
-        );
-
-        //check if the code activation has expired?
-
-        if (LocalDateTime.now().isAfter(token.getExpiresAt())) {
-            //resend the activation code mail
-            this.sendEmailValidation(token.getUser());
-
-            return "activation code has been expired, a new one has been sent to the same email, check and try agin!";
-        }
-
-        User user = token.getUser();
-
-        //after code activation check ,set  the user enabled to true
-        user.setEnabled(true);
-
-        token.setValidatedAt(LocalDateTime.now());
-        this.tokenRepository.save(token);
-        return "account activation is done successfully";
-
-    }
 
 }

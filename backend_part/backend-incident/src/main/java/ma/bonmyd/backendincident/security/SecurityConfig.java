@@ -58,6 +58,9 @@ public class SecurityConfig {
     @Value("${role.api}")
     private String roleApi;
 
+    @Value("${user.api}")
+    private String userApi;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
@@ -77,31 +80,32 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/webjars/**",
                                         "/swagger-ui.html"
-                                ) //endpoints without auth
+                                )
                                 .permitAll()
                                 .requestMatchers(authApi + "/login").permitAll()
                                 .requestMatchers(authApi + "/register").permitAll()
-                                .requestMatchers(authApi + "/activate-account").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, sectorApi + "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, sectorApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, sectorApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, sectorApi + "/**").hasAuthority("ADMIN")
 
                                 .requestMatchers(HttpMethod.GET, typeApi + "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, typeApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, typeApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, typeApi + "/**").hasAuthority("ADMIN")
+
+                                .requestMatchers(HttpMethod.GET, regionApi + "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, provinceApi + "/**").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, roleApi + "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, roleApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, roleApi + "/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, roleApi + "/**").hasAuthority("ADMIN")
+                                //==== || endpoints without auth ^^^ ABOVE ||
 
-                                .requestMatchers(HttpMethod.GET, incidentApi + "/**").permitAll()
+                                .requestMatchers(userApi + "/me").authenticated()
+                                //=== || endpoints with only auth ^^^  ABOVE ||
 
-                                .requestMatchers(regionApi + "/**").permitAll()
-                                .requestMatchers(provinceApi + "/**").permitAll()
+                                .requestMatchers(userApi + "/**").hasAuthority("admin")
+                                .requestMatchers(sectorApi + "/**").hasAuthority("admin".toLowerCase())
+                                .requestMatchers(typeApi + "/**").hasAuthority("admin".toLowerCase())
+                                .requestMatchers(roleApi + "/**").hasAuthority("admin".toLowerCase())
+                                //endpoints with both auth and admin role ^^^  ABOVE
+
+                                .requestMatchers(incidentApi + "/**").hasAuthority("admin")
+
                                 .requestMatchers(citizenApi + "/**").permitAll()
 
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
