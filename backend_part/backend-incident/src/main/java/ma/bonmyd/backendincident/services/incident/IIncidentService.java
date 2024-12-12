@@ -1,6 +1,7 @@
 package ma.bonmyd.backendincident.services.incident;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import ma.bonmyd.backendincident.dtos.ApiResponseGenericPagination;
 import ma.bonmyd.backendincident.dtos.incident.*;
 import ma.bonmyd.backendincident.dtos.territoriale.ProvinceDTOPagination;
 import ma.bonmyd.backendincident.dtos.territoriale.RegionDTO;
@@ -17,11 +18,11 @@ public interface IIncidentService {
     List<IncidentDTO> findAllIncidentsByImei(String imei);
     IncidentDTO createIncident(String incidentCreateDTOAsString, MultipartFile photoFile) throws JsonProcessingException;
     IncidentDTO updateIncidentByCitizen(IncidentUpdateDTO incidentUpdateDTO);
-    String updateIncidentStatus(Long incidentId, Status status);
+    String updateIncidentStatus(Long incidentId, StatusDTO statusDTO);
     String rejectIncident(Long incidentId, RejectionDTO rejectionDTO);
     String deleteIncident(Long id);
 
-    IncidentDTOPagination getIncidentsPage(int currentPage, int size);
+    ApiResponseGenericPagination<IncidentDTO> getIncidentsPage(int currentPage, int size);
 
 
 }

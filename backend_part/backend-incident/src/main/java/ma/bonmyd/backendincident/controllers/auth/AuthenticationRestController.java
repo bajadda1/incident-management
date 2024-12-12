@@ -12,6 +12,8 @@ import ma.bonmyd.backendincident.security.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("${auth.api}")
 
@@ -31,15 +33,10 @@ public class AuthenticationRestController {
         return ResponseEntity.ok(user1);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserRegisterDTO> getCurrentUser() {
-        UserRegisterDTO currentUser = authenticationService.getCurrentUser();
-        return ResponseEntity.ok(currentUser);
-    }
-
-    @PostMapping("/activate-account")
+    /* @PostMapping("/activate-account")
     public String getCurrentUser(@RequestBody ActivationCodeDTO activationCodeDTO) throws MessagingException {
         return this.authenticationService.activateAccount(activationCodeDTO);
-    }
+    } */
+
 
 }
