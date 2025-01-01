@@ -15,6 +15,8 @@ public class ApiResponseGenericPagination<T> {
     private int currentPage;
     private int pageSize;
     private int totalPages;
+    private long totalElements;
+    private int sliceTotalElements;
     private List<T> list;
 
 }

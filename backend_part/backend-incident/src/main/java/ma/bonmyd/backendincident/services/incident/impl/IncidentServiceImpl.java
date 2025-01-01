@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.bonmyd.backendincident.dtos.ApiResponseGenericPagination;
 import ma.bonmyd.backendincident.dtos.incident.*;
-import ma.bonmyd.backendincident.dtos.territoriale.RegionDTO;
 import ma.bonmyd.backendincident.dtos.users.CitizenDTO;
 import ma.bonmyd.backendincident.entities.incident.Incident;
 import ma.bonmyd.backendincident.entities.incident.Rejection;
@@ -20,12 +19,13 @@ import ma.bonmyd.backendincident.repositories.incident.RejectionRepository;
 import ma.bonmyd.backendincident.services.incident.IIncidentService;
 import ma.bonmyd.backendincident.services.territoriale.IProvinceService;
 import ma.bonmyd.backendincident.services.users.ICitizenService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import ma.bonmyd.backendincident.specifications.IncidentSpecification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -59,8 +60,7 @@ public class IncidentServiceImpl implements IIncidentService {
 
     @Override
     public Incident findIncident(Long id) {
-        return this.incidentRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format("incident with id=%d not found", id)));
+        return this.incidentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("incident with id=%d not found", id)));
     }
 
     @Override
@@ -69,17 +69,6 @@ public class IncidentServiceImpl implements IIncidentService {
         return this.incidentModelMapper.convertToDto(incident, IncidentDTO.class);
     }
 
-    @Override
-    public List<IncidentDTO> findAllIncidents() {
-        List<Incident> incidents = this.incidentRepository.findAll();
-        return this.incidentModelMapper.convertListToListDto(incidents, IncidentDTO.class);
-    }
-
-    @Override
-    public List<IncidentDTO> findAllIncidentsByImei(String imei) {
-        List<Incident> incidents = this.incidentRepository.findByCitizenImei(imei);
-        return this.incidentModelMapper.convertListToListDto(incidents, IncidentDTO.class);
-    }
 
     @Override
     public IncidentDTO createIncident(String incidentCreateDTOAsString, MultipartFile photoFile) throws JsonProcessingException {
@@ -130,33 +119,42 @@ public class IncidentServiceImpl implements IIncidentService {
         return this.incidentModelMapper.convertToDto(incidentToUpdate, IncidentDTO.class);
     }
 
+
     @Override
-    public String updateIncidentStatus(Long incidentId, StatusDTO statusDTO) {
+    public IncidentDTO updateIncidentStatus(Long incidentId, StatusDTO statusDTO) {
+
         Incident incidentToUpdate = this.findIncident(incidentId);
-        if (incidentToUpdate.getStatus() != statusDTO.getStatus()) {
-            incidentToUpdate.setStatus(statusDTO.getStatus());
-            incidentToUpdate.setUpdatedAt(new Date());
+
+        if (canUpdateStatus(incidentToUpdate.getStatus(), statusDTO.getStatus())) {
+            throw new RuntimeException("Invalid status transition");
         }
-        this.incidentRepository.save(incidentToUpdate);
-        return String.format("incident with id = %d status has been updated successfully", incidentId);
+
+        incidentToUpdate.setStatus(statusDTO.getStatus());
+
+        Incident updatedIncident = this.incidentRepository.save(incidentToUpdate);
+        return this.incidentModelMapper.convertToDto(updatedIncident, IncidentDTO.class);
     }
 
+
     @Override
-    public String rejectIncident(Long incidentId, RejectionDTO rejectionDTO) {
+    public IncidentDTO rejectIncident(Long incidentId, RejectionDTO rejectionDTO) {
 
         Incident incidentToReject = this.findIncident(incidentId);
-        if (incidentToReject.getStatus() != Status.PUBLISHED) {
-            incidentToReject.setStatus(Status.REJECTED);
-            incidentToReject.setUpdatedAt(new Date());
+
+        if (canUpdateStatus(incidentToReject.getStatus(), Status.REJECTED)) {
+            throw new RuntimeException("Invalid status transition");
         }
+
+        incidentToReject.setStatus(Status.REJECTED);
+        incidentToReject.setUpdatedAt(new Date());
 
         Rejection rejection = this.rejectionModelMapper.convertToEntity(rejectionDTO, Rejection.class);
         rejection.setIncident(incidentToReject);
-
-        this.incidentRepository.save(incidentToReject);
+        rejection.setDate(new Date());
+        Incident incident = this.incidentRepository.save(incidentToReject);
         this.rejectionRepository.save(rejection);
 
-        return String.format("incident with id = %d  has been blocked", incidentId);
+        return this.incidentModelMapper.convertToDto(incident, IncidentDTO.class);
     }
 
 
@@ -166,19 +164,65 @@ public class IncidentServiceImpl implements IIncidentService {
         return String.format("incident with id=%d has been deleted", id);
     }
 
+
     @Override
-    public ApiResponseGenericPagination<IncidentDTO> getIncidentsPage(int currentPage, int size) {
-        Pageable pageable = PageRequest.of(currentPage, size);
-        Page<Incident> incidents = this.incidentRepository.findAll(pageable);
-        Page<IncidentDTO> incidentDTOS = this.incidentModelMapper.convertPageToPageDto(incidents, IncidentDTO.class);
-        ApiResponseGenericPagination<IncidentDTO> apiResponseGenericPagination = new ApiResponseGenericPagination<>();
-        apiResponseGenericPagination.setCurrentPage(currentPage);
-        apiResponseGenericPagination.setPageSize(size);
-        apiResponseGenericPagination.setList(incidentDTOS.getContent());
-        apiResponseGenericPagination.setTotalPages(incidentDTOS.getTotalPages());
-        return apiResponseGenericPagination;
+    public ApiResponseGenericPagination<IncidentDTO> getFilteredIncidents(Status status, Long provinceId, Long regionId, Long sectorId, Long typeId, String description, Date date, int page, int size) {
+
+        Specification<Incident> incidentSpecification = Specification.where(IncidentSpecification.hasSectorId(sectorId)).and(IncidentSpecification.hasStatus(status)).and(IncidentSpecification.hasProvinceId(provinceId)).and(IncidentSpecification.hasRegionId(regionId)).and(IncidentSpecification.hasTypeId(typeId)).and(IncidentSpecification.descriptionContains(description)).and(IncidentSpecification.hasDate(date));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Incident> incidentPage = incidentRepository.findAll(incidentSpecification, pageable);
+
+        // Map the Page of entities to a Page of DTOs
+        Page<IncidentDTO> incidentDTOPage = incidentModelMapper.convertPageToPageDto(incidentPage, IncidentDTO.class);
+
+        // Build response
+        return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(incidentDTOPage.getContent()).build();
     }
 
+    @Override
+    public ApiResponseGenericPagination<IncidentDTO> getFilteredIncidentsByProfessional(Status status, Long provinceId, Long regionId, Long sectorId, Long typeId, String description, Date date, int page, int size) {
+        List<Status> allowedStatuses = List.of(Status.PUBLISHED, Status.PROCESSED, Status.IN_PROGRESS, Status.BLOCKED);
+        Specification<Incident> incidentSpecification = Specification.where(IncidentSpecification.hasSectorId(sectorId)).and(IncidentSpecification.hasAllowedStatuses(allowedStatuses)).and(IncidentSpecification.hasStatus(status)).and(IncidentSpecification.hasProvinceId(provinceId)).and(IncidentSpecification.hasRegionId(regionId)).and(IncidentSpecification.hasTypeId(typeId)).and(IncidentSpecification.descriptionContains(description)).and(IncidentSpecification.hasDate(date));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Incident> incidentPage = incidentRepository.findAll(incidentSpecification, pageable);
+
+        // Map the Page of entities to a Page of DTOs
+        Page<IncidentDTO> incidentDTOPage = incidentModelMapper.convertPageToPageDto(incidentPage, IncidentDTO.class);
+
+        // Build response
+        return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(incidentDTOPage.getContent()).build();
+    }
+
+    @Override
+    public ApiResponseGenericPagination<IncidentDTO> getFilteredIncidentsByCitizen(String imei, Status status, Long provinceId, Long regionId, Long sectorId, Long typeId, String description, Date date, int page, int size) {
+        Specification<Incident> incidentSpecification = Specification.where(IncidentSpecification.hasCitizenImei(imei)).and(IncidentSpecification.hasSectorId(sectorId)).and(IncidentSpecification.hasStatus(status)).and(IncidentSpecification.hasProvinceId(provinceId)).and(IncidentSpecification.hasRegionId(regionId)).and(IncidentSpecification.hasTypeId(typeId)).and(IncidentSpecification.descriptionContains(description)).and(IncidentSpecification.hasDate(date));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Incident> incidentPage = incidentRepository.findAll(incidentSpecification, pageable);
+
+        // Map the Page of entities to a Page of DTOs
+        Page<IncidentDTO> incidentDTOPage = incidentModelMapper.convertPageToPageDto(incidentPage, IncidentDTO.class);
+
+        // Build response
+        return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(incidentDTOPage.getContent()).build();
+    }
+
+
+    public boolean canUpdateStatus(Status oldStatus, Status newStatus) {
+        // Define allowed transitions
+        Map<Status, List<Status>> allowedTransitions = Map.of(Status.DECLARED, List.of(Status.PUBLISHED, Status.REJECTED), // DECLARED -> PUBLISHED or REJECTED
+                Status.REJECTED, List.of(), // No transitions allowed
+                Status.PUBLISHED, List.of(Status.IN_PROGRESS), // PUBLISHED -> IN_PROGRESS
+                Status.IN_PROGRESS, List.of(Status.PROCESSED, Status.BLOCKED), // IN_PROGRESS -> PROCESSED or BLOCKED
+                Status.PROCESSED, List.of(), // Final state, no transitions allowed
+                Status.BLOCKED, List.of() // Final state, no transitions allowed
+        );
+        // Check if the new status is allowed for the current old status
+        List<Status> validNextStatuses = allowedTransitions.getOrDefault(oldStatus, List.of());
+        return !validNextStatuses.contains(newStatus);
+    }
 
     private String uploadPhoto(MultipartFile file) {
         // Check if the upload directory exists, create if it doesn't
@@ -213,5 +257,4 @@ public class IncidentServiceImpl implements IIncidentService {
         }
         return "";
     }
-
 }

@@ -1,5 +1,6 @@
 package ma.bonmyd.backendincident.exceptions;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -91,5 +92,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value()) // 500
                 .message(ex.getMessage())
                 .build();
+    }
+
+    @ExceptionHandler(value = JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex, WebRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }

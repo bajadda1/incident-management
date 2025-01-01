@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ma.bonmyd.backendincident.dtos.territoriale.ProvinceDTO;
 import ma.bonmyd.backendincident.dtos.users.CitizenDTO;
 import ma.bonmyd.backendincident.enums.Status;
 
@@ -23,5 +24,6 @@ public class IncidentDTO {
     private TypeDTO typeDTO;
     private SectorDTO sectorDTO;
     private String location;
+    private ProvinceDTO provinceDTO;
 //    private CitizenDTO citizenDTO;
 }

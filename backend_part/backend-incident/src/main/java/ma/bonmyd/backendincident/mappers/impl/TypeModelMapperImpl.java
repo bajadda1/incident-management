@@ -21,9 +21,12 @@ import java.util.stream.Collectors;
 public class TypeModelMapperImpl implements IModelMapper<Type, TypeDTO> {
 
     private ModelMapper modelMapper;
+    private IModelMapper<Sector, SectorDTO> sectorModelMapper;
+
     @Autowired
-    public TypeModelMapperImpl(ModelMapper modelMapper) {
+    public TypeModelMapperImpl(ModelMapper modelMapper, IModelMapper<Sector, SectorDTO> sectorModelMapper) {
         this.modelMapper = modelMapper;
+        this.sectorModelMapper = sectorModelMapper;
         this.modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setPropertyCondition(Conditions.isNotNull());
@@ -32,13 +35,17 @@ public class TypeModelMapperImpl implements IModelMapper<Type, TypeDTO> {
     @Override
     public TypeDTO convertToDto(Type entity, Class<TypeDTO> dtoClass) {
         if (entity == null) return null;
-        return this.modelMapper.map(entity,dtoClass);
+        Sector sector = entity.getSector();
+        TypeDTO typeDTO = this.modelMapper.map(entity, dtoClass);
+        SectorDTO sectorDTO = this.sectorModelMapper.convertToDto(sector, SectorDTO.class);
+        typeDTO.setSectorDTO(sectorDTO);
+        return typeDTO;
     }
 
     @Override
     public Type convertToEntity(TypeDTO dto, Class<Type> entityClass) {
         if (dto == null) return null;
-        return this.modelMapper.map(dto,entityClass);
+        return this.modelMapper.map(dto, entityClass);
     }
 
     @Override

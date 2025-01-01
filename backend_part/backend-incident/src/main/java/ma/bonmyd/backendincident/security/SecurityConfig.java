@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -28,10 +29,13 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+
     @Autowired
-    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Value("${auth.api}")
@@ -91,6 +95,7 @@ public class SecurityConfig {
 
                                 .requestMatchers(HttpMethod.GET, regionApi + "/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, provinceApi + "/**").permitAll()
+                                .requestMatchers(incidentApi + "/**").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, roleApi + "/**").permitAll()
                                 //==== || endpoints without auth ^^^ ABOVE ||
@@ -104,7 +109,7 @@ public class SecurityConfig {
                                 .requestMatchers(roleApi + "/**").hasAuthority("admin".toLowerCase())
                                 //endpoints with both auth and admin role ^^^  ABOVE
 
-                                .requestMatchers(incidentApi + "/**").hasAuthority("admin")
+//                                .requestMatchers(incidentApi + "/**").hasAuthority("admin")
 
                                 .requestMatchers(citizenApi + "/**").permitAll()
 
@@ -112,11 +117,18 @@ public class SecurityConfig {
                                 .anyRequest()  //other endpoints need auth
                                 .authenticated()
 
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(this.authenticationProvider);
 
-        http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+
+//                .exceptionHandling(customizer -> customizer.authenticationEntryPoint((request, response, authException) -> {
+//                    // Let exceptions propagate and be handled by @ControllerAdvice
+//                    throw authException;
+//                }))
+
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(this.authenticationProvider)
+                .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // Use the custom entry point
         return http.build();
 
     }

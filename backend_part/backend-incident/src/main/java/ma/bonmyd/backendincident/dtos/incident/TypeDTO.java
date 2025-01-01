@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class TypeDTO {
     private Long id;
     private String name;
+    SectorDTO sectorDTO;
 }

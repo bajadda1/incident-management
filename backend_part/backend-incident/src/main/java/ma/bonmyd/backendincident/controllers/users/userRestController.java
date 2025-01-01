@@ -53,15 +53,16 @@ public class userRestController {
     }
 
     //Auth + Admin role ==============
-    @GetMapping()
-    public List<UserResponseDTO> getProfessionals() {
-        return this.userService.getAllProfessionals();
-    }
-
     //Auth + Admin role ==============
-    @GetMapping("/pagination")
-    public ApiResponseGenericPagination<UserResponseDTO> getProfessionals(@RequestParam(name = "current", defaultValue = "${default.current.page}") int current, @RequestParam(name = "size", defaultValue = "${default.page.size}") int size) {
-        return this.userService.getAllProfessionalsPagination(current, size);
+    @GetMapping()
+    public ApiResponseGenericPagination<UserResponseDTO> getProfessionals(@RequestParam(name = "enabled", required = false) Boolean enabled, @RequestParam(name = "sector", required = false) Long sectorId, @RequestParam(name = "fullname", required = false) String fullname, @RequestParam(name = "username", required = false) String username, @RequestParam(name = "page", defaultValue = "${default.current.page}") int current, @RequestParam(name = "size", defaultValue = "${default.page.size}") int size) {
+        return this.userService.getFilteredUsers(enabled, sectorId, fullname, username, current, size);
     }
 
+
+    @DeleteMapping("/{id}")
+    public String deleteProfessional(@PathVariable Long id) {
+        return this.userService.deleteProfessional(id);
+    }
 }
+

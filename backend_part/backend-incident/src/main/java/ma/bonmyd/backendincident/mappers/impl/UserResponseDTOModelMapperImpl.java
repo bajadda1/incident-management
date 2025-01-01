@@ -26,6 +26,7 @@ public class UserResponseDTOModelMapperImpl implements IModelMapper<User, UserRe
     private ModelMapper modelMapper;
     private IModelMapper<Sector, SectorDTO> sectorModelMapper;
     private IModelMapper<Role, RoleDTO> roleModelMapper;
+
     @Autowired
     public UserResponseDTOModelMapperImpl(ModelMapper modelMapper, IModelMapper<Sector, SectorDTO> sectorModelMapper, IModelMapper<Role, RoleDTO> roleModelMapper) {
         this.modelMapper = modelMapper;
@@ -39,9 +40,9 @@ public class UserResponseDTOModelMapperImpl implements IModelMapper<User, UserRe
     @Override
     public UserResponseDTO convertToDto(User entity, Class<UserResponseDTO> dtoClass) {
         if (entity == null) return null;
-        SectorDTO sectorDTO=this.sectorModelMapper.convertToDto(entity.getSector(),SectorDTO.class);
-        RoleDTO roleDTO=this.roleModelMapper.convertToDto(entity.getRole(), RoleDTO.class);
-        UserResponseDTO userRegisterDTO=this.modelMapper.map(entity, dtoClass);
+        SectorDTO sectorDTO = this.sectorModelMapper.convertToDto(entity.getSector(), SectorDTO.class);
+        RoleDTO roleDTO = this.roleModelMapper.convertToDto(entity.getRole(), RoleDTO.class);
+        UserResponseDTO userRegisterDTO = this.modelMapper.map(entity, dtoClass);
         userRegisterDTO.setRoleDTO(roleDTO);
         userRegisterDTO.setSectorDTO(sectorDTO);
         return userRegisterDTO;
@@ -50,9 +51,9 @@ public class UserResponseDTOModelMapperImpl implements IModelMapper<User, UserRe
     @Override
     public User convertToEntity(UserResponseDTO dto, Class<User> entityClass) {
         if (dto == null) return null;
-        Sector sector=this.sectorModelMapper.convertToEntity(dto.getSectorDTO(),Sector.class);
-        Role role=this.roleModelMapper.convertToEntity(dto.getRoleDTO(),Role.class);
-        User user=this.modelMapper.map(dto, entityClass);
+        Sector sector = this.sectorModelMapper.convertToEntity(dto.getSectorDTO(), Sector.class);
+        Role role = this.roleModelMapper.convertToEntity(dto.getRoleDTO(), Role.class);
+        User user = this.modelMapper.map(dto, entityClass);
         user.setRole(role);
         user.setSector(sector);
         return user;
@@ -77,6 +78,6 @@ public class UserResponseDTOModelMapperImpl implements IModelMapper<User, UserRe
     @Override
     public Page<UserResponseDTO> convertPageToPageDto(Page<User> entityList, Class<UserResponseDTO> outClass) {
         if (entityList == null) return Page.empty();
-        return entityList.map(element -> modelMapper.map(element, outClass));
+        return entityList.map(element -> convertToDto(element, outClass));
     }
 }

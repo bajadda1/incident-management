@@ -37,16 +37,16 @@ public class ProvinceModelMapperImpl implements IModelMapper<Province, ProvinceD
         if (entity == null) return null;
         Region region=entity.getRegion();
         ProvinceDTO provinceDTO=this.modelMapper.map(entity, dtoClass);
-//        provinceDTO.setRegionDTO(this.regionModelMapper.convertToDto(region,RegionDTO.class));
+        provinceDTO.setRegionDTO(this.regionModelMapper.convertToDto(region,RegionDTO.class));
         return provinceDTO;
     }
 
     @Override
     public Province convertToEntity(ProvinceDTO dto, Class<Province> entityClass) {
         if (dto == null) return null;
-//        RegionDTO regionDTO=dto.getRegionDTO();
+        RegionDTO regionDTO=dto.getRegionDTO();
         Province province=this.modelMapper.map(dto, entityClass);
-//        province.setRegion(this.regionModelMapper.convertToEntity(regionDTO,Region.class));
+        province.setRegion(this.regionModelMapper.convertToEntity(regionDTO,Region.class));
         return province;
     }
 
