@@ -6,7 +6,8 @@ import {
   Ripple,
   Collapse,
   initTWE,
-  Modal
+  Modal,
+  Tab
 } from "tw-elements";
 
 // Initialization for ES Users
@@ -28,7 +29,8 @@ import {NgxSpinnerService} from 'ngx-spinner';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  standalone: false
 })
 export class AppComponent implements OnInit, AfterViewChecked {
   title = 'frontend-incident';
@@ -40,7 +42,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
-    initTWE({Dropdown, Ripple, Collapse, Modal});
+    initTWE({Dropdown, Ripple, Collapse, Modal, Tab});
 
     const token = localStorage.getItem('JWT_TOKEN');
     if (token) {
@@ -80,7 +82,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewChecked(): void {
-    initTWE({Dropdown, Ripple, Collapse,Modal});// Reinitialize whenever view changes
+    initTWE({Dropdown, Ripple, Collapse, Modal,Tab});// Reinitialize whenever view changes
   }
 
 }

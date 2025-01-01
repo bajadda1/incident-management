@@ -5,13 +5,15 @@ import {UserService} from '../../services/auth-service/user.service';
 import {UserLoginDTO} from '../../models/user-login';
 import {data} from 'autoprefixer';
 import {Router} from '@angular/router';
+import {UtilisateurService} from '../../services/user-service/user.service';
 
 // import {error} from '@angular/compiler-cli/src/transformers/util';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
+  standalone: false
 })
 export class LoginComponent implements OnInit {
 
@@ -19,7 +21,10 @@ export class LoginComponent implements OnInit {
   errorMessage!: string;
 
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
+  constructor(private fb: FormBuilder,
+              private userService: UserService,
+              private utilisateurService: UtilisateurService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
@@ -53,13 +58,13 @@ export class LoginComponent implements OnInit {
       next: (resp: any) => {
         console.log(resp)
         this.errorMessage = ''
-        this.router.navigateByUrl('/services/users')
+        this.router.navigateByUrl('/services/incidents')
       },
       error: (err: any) => {
         console.error(err.error.message)
         this.errorMessage = err.error.message;
       }
-    })
+    });
   }
 
 

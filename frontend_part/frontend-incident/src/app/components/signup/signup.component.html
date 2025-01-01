@@ -193,7 +193,8 @@
         <!-- Sector Selection -->
 
 
-        <div class="mt-10 w-full" [formGroup]="formRegister">
+        <div *ngIf="sectors !==[]"
+             class="mt-10 w-full" [formGroup]="formRegister">
           <div class="relative w-full" data-twe-dropdown-position="dropup">
             <!-- Dropdown Button -->
             <button
@@ -223,7 +224,7 @@
                   class="cursor-pointer block w-full whitespace-nowrap px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
                   (click)="choseSector(sector)"
                   data-twe-dropdown-item-ref>
-                  {{ sector?.name }}
+                  {{ sector.name }}
                 </a>
               </li>
             </ul>
@@ -255,7 +256,7 @@
   </div>
 
   <!-- Loading Spinner -->
-<!--  <div *ngIf="loading" class="flex justify-center items-center h-full">-->
-<!--    <app-spinner></app-spinner>-->
-<!--  </div>-->
+  <!--  <div *ngIf="loading" class="flex justify-center items-center h-full">-->
+  <!--    <app-spinner></app-spinner>-->
+  <!--  </div>-->
 </div>

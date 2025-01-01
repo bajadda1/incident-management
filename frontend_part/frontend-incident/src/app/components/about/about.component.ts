@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
-  styleUrl: './about.component.css'
+  styleUrl: './about.component.css',
+  standalone: false
 })
 export class AboutComponent {
 
@@ -41,6 +42,25 @@ export class AboutComponent {
   ];
   allExpanded!: boolean;
 
+
+  teams = [
+    {
+      name: "Ahmed BAJADDA",
+      profession: "Backend Developer",
+      imageURL: "assets/team/bajadda.jpg",
+      fbURL: "",
+      twitterURL: "",
+      linkedInURL: "https://www.linkedin.com/in/ahmed-bajadda/"
+    },
+    {
+      name: "Oussama Mazouz",
+      profession: "Frontend Developer",
+      imageURL: "assets/team/mazouz.jpg",
+      fbURL: "",
+      twitterURL: "",
+      linkedInURL: "https://www.linkedin.com/in/oussama-mazouz-993a32241/"
+    },
+  ];
 
   toggle(item: any) {
     item.open = !item.open;

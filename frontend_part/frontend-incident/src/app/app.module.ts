@@ -21,7 +21,6 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCoffee, faHome} from '@fortawesome/free-solid-svg-icons';
 import {ServiceSidebarComponent} from './components/service-sidebar/service-sidebar.component';
-import {UserListComponent} from './components/user-list/user-list.component';
 import {UserItemComponent} from './components/user-item/user-item.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {SettingsComponent} from './components/settings/settings.component';
@@ -41,6 +40,7 @@ import {UnauthorizedComponent} from './components/unauthorized/unauthorized.comp
 import {NgxSpinnerModule} from 'ngx-spinner';
 import {SpinnerInterceptor} from './services/spinner-interceptor/spinner.interceptor';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgOptimizedImage} from "@angular/common";
 
 library.add(faCoffee, faHome);
 
@@ -61,7 +61,6 @@ library.add(faCoffee, faHome);
     FooterComponent,
 
     ServiceSidebarComponent,
-    UserListComponent,
     UserItemComponent,
     ProfileComponent,
     SettingsComponent,
@@ -69,15 +68,16 @@ library.add(faCoffee, faHome);
     SpinnerComponent,
     UnauthorizedComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    FontAwesomeModule,
-    ReactiveFormsModule,
-    NgxSpinnerModule,
-    BrowserAnimationsModule,
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        FontAwesomeModule,
+        ReactiveFormsModule,
+        NgxSpinnerModule,
+        BrowserAnimationsModule,
+        NgOptimizedImage,
+    ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     provideAnimationsAsync(),
