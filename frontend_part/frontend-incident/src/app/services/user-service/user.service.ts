@@ -1,18 +1,21 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {catchError, map, Observable, throwError} from 'rxjs';
 import {UserResponseDTO} from '../../models/user-response';
 import {ApiResponseGenericPagination} from '../../models/api-response';
+import {SectorDTO} from '../../models/sector';
+import {IncidentDTO} from '../../models/incident';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UtilisateurService {
 
   url = environment.backendHost
   context = environment.contextPath
   fullURL = this.url + this.context
+  professionalSector!: SectorDTO
 
   constructor(private httpClient: HttpClient) {
   }
@@ -20,7 +23,17 @@ export class UserService {
 
   // Get the current user
   getCurrentUser(): Observable<UserResponseDTO> {
-    return this.httpClient.get<UserResponseDTO>(`${this.fullURL}/users/me`);
+    return this.httpClient.get<UserResponseDTO>(`${this.fullURL}/users/me`).pipe(
+      map(response => {
+        this.professionalSector = response.sectorDTO;
+
+        return response; // Pass the response forward
+
+      }),
+      catchError(error => {
+        return throwError(() => error); // Rethrow the error
+      })
+    );
   }
 
   // Enable a user by email
@@ -60,22 +73,24 @@ export class UserService {
     );
   }
 
-  // Get all professionals
-  getProfessionals(): Observable<UserResponseDTO[]> {
-    return this.httpClient.get<UserResponseDTO[]>(`${this.fullURL}/users`);
-  }
-
-  // Get professionals with pagination
-  getProfessionalsPagination(
-    current: number,
-    size: number
-  ): Observable<ApiResponseGenericPagination<UserResponseDTO>> {
-    const params = new HttpParams()
-      .set('current', current.toString())
+  searchProfessionals(filters: {
+    enabled: boolean | null;
+    sectorId: number | null;
+    username: string;
+    fullname: string;
+  }, page: number, size: number): Observable<ApiResponseGenericPagination<UserResponseDTO>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
       .set('size', size.toString());
-    return this.httpClient.get<ApiResponseGenericPagination<UserResponseDTO>>(
-      `${this.fullURL}/users/pagination`,
-      {params}
-    );
+
+    // Append filter parameters if they are defined
+    if (filters.enabled != null) params = params.set('enabled', filters.enabled.toString());
+    if (filters.sectorId !== null && filters.sectorId !== undefined) params = params.set('sector', filters.sectorId.toString());
+    if (filters.username) params = params.set('username', filters.username);
+    if (filters.fullname) params = params.set('fullname', filters.fullname);
+
+    console.log('Final Request Params:', params.toString());
+
+    return this.httpClient.get<any>(`${this.fullURL}/users`, {params});
   }
 }

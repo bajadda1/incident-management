@@ -8,97 +8,99 @@
       (ngSubmit)="submit()"
       class="w-full h-full px-8 py-12 bg-gray-50 grid place-items-center"
     >
-     <div class=" w-full">
-       <!-- Error Alert -->
-       <div
-         *ngIf="errorMessage"
-         class="bg-red-100 text-red-800 px-4 py-3 mb-6 rounded-lg relative shadow-md"
-         role="alert"
-       >
-         <strong class="font-bold">Error!</strong>
-         <span class="block sm:inline ml-2">{{ errorMessage }}</span>
-         <button
-           type="button"
-           class="absolute right-4 top-1/2 -translate-y-1/2 bg-red-200 text-red-600 rounded-full p-1 hover:bg-red-300"
-           (click)="errorMessage = ''"
-         >
-           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-             <path fill-rule="evenodd"
-                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.293-10.707a1 1 0 10-1.414-1.414L10 8.586 8.121 6.707a1 1 0 00-1.414 1.414L8.586 10l-1.879 1.879a1 1 0 101.414 1.414L10 11.414l1.879 1.879a1 1 0 001.414-1.414L11.414 10l1.879-1.879z"
-                   clip-rule="evenodd"/>
-           </svg>
-         </button>
-       </div>
+      <div class=" w-full">
+        <!-- Error Alert -->
+        <div
+          *ngIf="errorMessage"
+          class="bg-red-100 text-red-800 px-4 py-3 mb-6 rounded-lg relative shadow-md"
+          role="alert"
+        >
+          <strong class="font-bold">Error!</strong>
+          <span class="block sm:inline ml-2">{{ errorMessage }}</span>
+          <button
+            type="button"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-red-200 text-red-600 rounded-full p-1 hover:bg-red-300"
+            (click)="errorMessage = ''"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.293-10.707a1 1 0 10-1.414-1.414L10 8.586 8.121 6.707a1 1 0 00-1.414 1.414L8.586 10l-1.879 1.879a1 1 0 101.414 1.414L10 11.414l1.879 1.879a1 1 0 001.414-1.414L11.414 10l1.879-1.879z"
+                    clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </div>
 
-       <!-- Header -->
-       <div class="mb-8 text-center">
-         <h3 class="text-blue-600 text-4xl font-extrabold ">Sign In</h3>
-         <p class="text-gray-600 text-sm mt-2">Sign in to your account to continue.</p>
-       </div>
+        <!-- Header -->
+        <div class="mb-8 text-center">
+          <h3 class="text-blue-600 text-4xl font-extrabold ">Sign In</h3>
+          <p class="text-gray-600 text-sm mt-2">Sign in to your account to continue.</p>
+        </div>
 
-       <!-- Email Field -->
-       <div class="mb-6">
-         <label class="block text-gray-800 font-semibold mb-2">Email</label>
-         <div class="relative">
-           <input
-             type="email"
-             formControlName="username"
-             required
-             class="w-full px-4 py-3 bg-gray-100 rounded-lg border focus:outline-none focus:ring focus:ring-blue-300"
-             placeholder="Enter your email"
-           />
-           <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <!-- Email Field -->
+        <div class="mb-6">
+          <label class="block text-gray-800 font-semibold mb-2">Email</label>
+          <div class="relative">
+            <input
+              type="email"
+              formControlName="username"
+              required
+              autocomplete="username"
+              class="w-full px-4 py-3 bg-gray-100 rounded-lg border focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder="Enter your email"
+            />
+            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
             <i class="fa-solid fa-envelope"></i>
           </span>
-         </div>
-         <p *ngIf="formLogin.get('username')?.invalid && formLogin.get('username')?.touched"
-            class="text-red-500 text-sm mt-2">
-           {{ formLogin.get('username')?.hasError('required') ? 'Email is required.' : 'Invalid email address.' }}
-         </p>
-       </div>
+          </div>
+          <p *ngIf="formLogin.get('username')?.invalid && formLogin.get('username')?.touched"
+             class="text-red-500 text-sm mt-2">
+            {{ formLogin.get('username')?.hasError('required') ? 'Email is required.' : 'Invalid email address.' }}
+          </p>
+        </div>
 
-       <!-- Password Field -->
-       <div class="mb-6">
-         <label class="block text-gray-800 font-semibold mb-2">Password</label>
-         <div class="relative">
-           <input
-             type="password"
-             formControlName="password"
-             required
-             class="w-full px-4 py-3 bg-gray-100 rounded-lg border focus:outline-none focus:ring focus:ring-blue-300"
-             placeholder="Enter your password"
-           />
-           <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <!-- Password Field -->
+        <div class="mb-6">
+          <label class="block text-gray-800 font-semibold mb-2">Password</label>
+          <div class="relative">
+            <input
+              type="password"
+              formControlName="password"
+              required
+              autocomplete="password"
+              class="w-full px-4 py-3 bg-gray-100 rounded-lg border focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder="Enter your password"
+            />
+            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
             <i class="fa-solid fa-lock"></i>
           </span>
-         </div>
-         <p *ngIf="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
-            class="text-red-500 text-sm mt-2">
-           {{ formLogin.get('password')?.hasError('required') ? 'Password is required.' : 'Password must be at least 8 characters.' }}
-         </p>
-       </div>
+          </div>
+          <p *ngIf="formLogin.get('password')?.invalid && formLogin.get('password')?.touched"
+             class="text-red-500 text-sm mt-2">
+            {{ formLogin.get('password')?.hasError('required') ? 'Password is required.' : 'Password must be at least 8 characters.' }}
+          </p>
+        </div>
 
-       <!-- Submit Button -->
-       <div class="mt-8">
-         <button
-           type="submit"
-           class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:ring focus:ring-blue-300"
-         >
-           Sign In
-         </button>
-       </div>
+        <!-- Submit Button -->
+        <div class="mt-8">
+          <button
+            type="submit"
+            class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:ring focus:ring-blue-300"
+          >
+            Sign In
+          </button>
+        </div>
 
-       <!-- Footer -->
-       <p class="mt-8 text-gray-700 text-center">
-         Don't have an account?
-         <a
-           routerLink="/signup"
-           class="text-blue-600 hover:underline font-semibold"
-         >
-           Create one now
-         </a>
-       </p>
-     </div>
+        <!-- Footer -->
+        <p class="mt-8 text-gray-700 text-center">
+          Don't have an account?
+          <a
+            routerLink="/signup"
+            class="text-blue-600 hover:underline font-semibold"
+          >
+            Create one now
+          </a>
+        </p>
+      </div>
     </form>
 
     <!-- Image Section -->

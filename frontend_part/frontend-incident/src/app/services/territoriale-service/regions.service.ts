@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {RegionDTO} from '../../models/region';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class RegionsService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getRegions(): Observable<any> {
-    return this.httpClient.get<any>(`${this.fullURL}/regions`);
+  getRegions(): Observable<RegionDTO[]> {
+    return this.httpClient.get<RegionDTO[]>(`${this.fullURL}/regions`);
   }
 
 }

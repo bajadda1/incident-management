@@ -7,6 +7,7 @@ import {BehaviorSubject, catchError, map, Observable, of, throwError} from 'rxjs
 import {UserLoginDTO} from '../../models/user-login';
 import {jwtDecode} from 'jwt-decode';
 import {stringify} from 'postcss';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,8 @@ export class UserService {
   sub!: any;
   username: any
   authorities!: any;
-  exp!:any;
+  isAdmin!: boolean;
+  exp!: any;
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -35,7 +37,7 @@ export class UserService {
     return this.isAuthenticatedSubject.getValue();
   }
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private router: Router) {
   }
 
   signup(userRegisterDTO: UserRegisterDTO) {
@@ -49,9 +51,8 @@ export class UserService {
           localStorage.setItem('JWT_TOKEN', response['jwt']);
           this.jwt = response['jwt']
 
-          this.isLoggedIn = true;
           this.loadProfile(this.jwt)
-          this.setAuthenticated(true);
+
           return response; // Pass the response forward
 
         }),
@@ -67,6 +68,7 @@ export class UserService {
     localStorage.removeItem('JWT_TOKEN');
     this.isLoggedIn = false;
     this.setAuthenticated(false);
+    this.router.navigateByUrl("/login")
   }
 
   loadProfile(jwt: any) {
@@ -81,9 +83,14 @@ export class UserService {
     //extract username
     this.username = decodedJWT['fullname']
     console.log(this.username)
-    this.exp=decodedJWT['exp']*1000
+    this.exp = decodedJWT['exp'] * 1000
     console.log(this.exp)
     console.log(Date.now())
+    this.isAdmin = this.authorities[0] == "admin"
+    console.log("IS ADMIN ???")
+    console.log(this.isAdmin)
+    this.isLoggedIn = true;
+    this.setAuthenticated(true);
   }
 
   isAuthenticated(): boolean {

@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {ProvinceDTO} from '../../models/province';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class ProvincesService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getProvinces(): Observable<any> {
-    return this.httpClient.get<any>(`${this.fullURL}/provinces`);
+  getProvinces(): Observable<ProvinceDTO[]> {
+    return this.httpClient.get<ProvinceDTO[]>(`${this.fullURL}/provinces`);
   }
 }

@@ -16,16 +16,16 @@ import {Router} from '@angular/router';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
+  styleUrl: './signup.component.css',
+  standalone: false
 })
 export class SignupComponent implements OnInit {
 
   formRegister!: FormGroup;
-  sectors: Array<SectorDTO> = [{id: 0, name: "ahmed"}, {id: 0, name: "ahmed"}, {id: 0, name: "ahmed"}];
+  sectors: SectorDTO[] = [];
 
   chosenSector!: SectorDTO;
 
-  loading: boolean = false; // Add a loading state
   errorMessage!: string;
 
   constructor(private userService: UserService,
@@ -62,16 +62,14 @@ export class SignupComponent implements OnInit {
   }
 
   getSector() {
-    this.sectorService.getSectors().subscribe({
-        next: (res: any) => {
-          this.sectors = res
-          console.log(this.sectors)
-        },
-        error: (err: any) => {
-          console.log(err)
-          this.errorMessage = 'Failed to load sectors.';
-        }
-
+    this.sectorService.getSectors().subscribe(
+      (res) => {
+        this.sectors = res
+        console.log(this.sectors)
+      },
+      (err) => {
+        console.log(err)
+        this.errorMessage = 'Failed to load sectors.';
       }
     )
   }
@@ -89,17 +87,14 @@ export class SignupComponent implements OnInit {
       })
       return;
     }
-    this.loading = true;
     this.userService.signup(this.formRegister.value).subscribe({
       next: (resp: any) => {
         console.log(resp)
         this.errorMessage = ''
-        this.loading = false;
         this.router.navigateByUrl('/login');
       },
       error: (err: any) => {
         console.log(err)
-        this.loading = false;
         this.errorMessage = err.error.message;
       }
     })

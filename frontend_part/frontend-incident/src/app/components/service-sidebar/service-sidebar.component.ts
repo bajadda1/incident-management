@@ -3,9 +3,10 @@ import {UserService} from '../../services/auth-service/user.service';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-service-sidebar',
-  templateUrl: './service-sidebar.component.html',
-  styleUrl: './service-sidebar.component.css'
+    selector: 'app-service-sidebar',
+    templateUrl: './service-sidebar.component.html',
+    styleUrl: './service-sidebar.component.css',
+    standalone: false
 })
 export class ServiceSidebarComponent implements OnInit {
 

@@ -12,10 +12,10 @@ import {ServiceSidebarComponent} from './components/service-sidebar/service-side
 import {AuthenticationGuard} from './services/auth-guard/authentication-guard.service';
 import {AuthorizationGuard} from './services/auth-guard/authorization-guard.service';
 import {MapComponent} from './components/map/map.component';
-import {UserListComponent} from './components/user-list/user-list.component';
 import {ProfileComponent} from './components/profile/profile.component';
 import {UnauthorizedComponent} from './components/unauthorized/unauthorized.component';
 import {NotFoundComponent} from './components/not-found/not-found.component';
+import {SettingsComponent} from './components/settings/settings.component';
 
 const routes: Routes = [
   {
@@ -44,10 +44,6 @@ const routes: Routes = [
     component: MapComponent,
   },
   {
-    path: "list",
-    component: UserListComponent,
-  },
-  {
     path: "unauthorized",
     component: UnauthorizedComponent,
   },
@@ -55,6 +51,12 @@ const routes: Routes = [
     path: "profile",
     component: ProfileComponent,
     canActivate: [AuthenticationGuard]
+  },
+  {
+    path: "settings",
+    component: SettingsComponent,
+    canActivate: [AuthorizationGuard],
+    data: {roles: "admin"}
   },
   //services for admin and professional
   {
