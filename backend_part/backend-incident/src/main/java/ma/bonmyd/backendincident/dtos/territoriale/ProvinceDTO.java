@@ -14,6 +14,6 @@ public class ProvinceDTO {
     private String name;
     private double area;
     private double perimeter;
-//    private RegionDTO regionDTO;
+    private RegionDTO regionDTO;
     private String geom;
 }

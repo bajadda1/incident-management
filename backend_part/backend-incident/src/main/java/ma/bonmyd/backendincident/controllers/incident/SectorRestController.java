@@ -15,11 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 public class SectorRestController {
 
-    private  ISectorService sectorService;
+    private ISectorService sectorService;
 
     // Get a sector by ID
     @GetMapping("/{id}")
-    public SectorDTO getSectorById(@Valid  @PathVariable Long id) {
+    public SectorDTO getSectorById(@Valid @PathVariable Long id) {
         return sectorService.getSector(id);
     }
 

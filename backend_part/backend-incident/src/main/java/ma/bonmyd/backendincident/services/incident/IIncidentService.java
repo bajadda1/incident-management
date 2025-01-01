@@ -7,22 +7,55 @@ import ma.bonmyd.backendincident.dtos.territoriale.ProvinceDTOPagination;
 import ma.bonmyd.backendincident.dtos.territoriale.RegionDTO;
 import ma.bonmyd.backendincident.entities.incident.Incident;
 import ma.bonmyd.backendincident.enums.Status;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IIncidentService {
     Incident findIncident(Long id);
+
     IncidentDTO getIncident(Long id);
-    List<IncidentDTO> findAllIncidents();
-    List<IncidentDTO> findAllIncidentsByImei(String imei);
+
     IncidentDTO createIncident(String incidentCreateDTOAsString, MultipartFile photoFile) throws JsonProcessingException;
+
     IncidentDTO updateIncidentByCitizen(IncidentUpdateDTO incidentUpdateDTO);
-    String updateIncidentStatus(Long incidentId, StatusDTO statusDTO);
-    String rejectIncident(Long incidentId, RejectionDTO rejectionDTO);
+
+    IncidentDTO updateIncidentStatus(Long incidentId, StatusDTO statusDTO);
+
+    IncidentDTO rejectIncident(Long incidentId, RejectionDTO rejectionDTO);
+
     String deleteIncident(Long id);
 
-    ApiResponseGenericPagination<IncidentDTO> getIncidentsPage(int currentPage, int size);
+    ApiResponseGenericPagination<IncidentDTO> getFilteredIncidents(Status status,
+                                                                   Long provinceId,
+                                                                   Long regionId,
+                                                                   Long sectorId,
+                                                                   Long typeId,
+                                                                   String description,
+                                                                   Date date,
+                                                                   int page, int size);
+
+    ApiResponseGenericPagination<IncidentDTO> getFilteredIncidentsByProfessional(Status status,
+                                                                                 Long provinceId,
+                                                                                 Long regionId,
+                                                                                 Long sectorId,
+                                                                                 Long typeId,
+                                                                                 String description,
+                                                                                 Date date,
+                                                                                 int page, int size);
+
+
+    ApiResponseGenericPagination<IncidentDTO> getFilteredIncidentsByCitizen(String imei,
+                                                                            Status status,
+                                                                            Long provinceId,
+                                                                            Long regionId,
+                                                                            Long sectorId,
+                                                                            Long typeId,
+                                                                            String description,
+                                                                            Date date,
+                                                                            int page, int size);
 
 
 }
