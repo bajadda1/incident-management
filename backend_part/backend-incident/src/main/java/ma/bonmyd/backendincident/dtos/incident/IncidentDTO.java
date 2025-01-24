@@ -26,4 +26,5 @@ public class IncidentDTO {
     private String location;
     private ProvinceDTO provinceDTO;
 //    private CitizenDTO citizenDTO;
+    private RejectionDTO rejectionDTO;
 }

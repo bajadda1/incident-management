@@ -66,6 +66,7 @@ public class IncidentServiceImpl implements IIncidentService {
     @Override
     public IncidentDTO getIncident(Long id) {
         Incident incident = this.findIncident(id);
+        incident.setPhoto(getFileNameFromPath(incident.getPhoto()));
         return this.incidentModelMapper.convertToDto(incident, IncidentDTO.class);
     }
 
@@ -176,8 +177,33 @@ public class IncidentServiceImpl implements IIncidentService {
         // Map the Page of entities to a Page of DTOs
         Page<IncidentDTO> incidentDTOPage = incidentModelMapper.convertPageToPageDto(incidentPage, IncidentDTO.class);
 
+        List<IncidentDTO> updatedList = incidentDTOPage.getContent().stream()
+                .peek(incidentDTO -> {
+                    // Create a copy or update the object
+                    incidentDTO.setPhoto(getFileNameFromPath(incidentDTO.getPhoto()));
+                })
+                .toList();        // Build response
+        return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(updatedList).build();
+    }
+
+    @Override
+    public List<IncidentDTO> getAllFilteredIncidents(Status status, Long provinceId, Long regionId, Long sectorId, Long typeId, String description, Date startDate, Date endDate) {
+
+        Specification<Incident> incidentSpecification = Specification
+                .where(IncidentSpecification.hasSectorId(sectorId))
+                .and(IncidentSpecification.hasStatus(status))
+                .and(IncidentSpecification.hasProvinceId(provinceId))
+                .and(IncidentSpecification.hasRegionId(regionId))
+                .and(IncidentSpecification.hasTypeId(typeId))
+                .and(IncidentSpecification.descriptionContains(description))
+                .and(IncidentSpecification.hasDateBetween(startDate, endDate));
+
+        List<Incident> incidents = incidentRepository.findAll(incidentSpecification);
+
+        // Map the Page of entities to a Page of DTOs
+
         // Build response
-        return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(incidentDTOPage.getContent()).build();
+        return incidentModelMapper.convertListToListDto(incidents, IncidentDTO.class);
     }
 
     @Override
@@ -209,10 +235,15 @@ public class IncidentServiceImpl implements IIncidentService {
         return ApiResponseGenericPagination.<IncidentDTO>builder().currentPage(incidentDTOPage.getNumber()).pageSize(incidentDTOPage.getSize()).totalPages(incidentDTOPage.getTotalPages()).totalElements(incidentDTOPage.getTotalElements()).list(incidentDTOPage.getContent()).build();
     }
 
+    @Override
+    public List<IncidentStatusGroupDTO> getIncidentsGroupedByStatus() {
+        return incidentRepository.findIncidentsGroupedByStatus();
+    }
 
     public boolean canUpdateStatus(Status oldStatus, Status newStatus) {
         // Define allowed transitions
-        Map<Status, List<Status>> allowedTransitions = Map.of(Status.DECLARED, List.of(Status.PUBLISHED, Status.REJECTED), // DECLARED -> PUBLISHED or REJECTED
+        Map<Status, List<Status>> allowedTransitions = Map.of(Status.DECLARED, List.of(Status.PUBLISHED, Status.REJECTED),
+                // DECLARED -> PUBLISHED or REJECTED
                 Status.REJECTED, List.of(), // No transitions allowed
                 Status.PUBLISHED, List.of(Status.IN_PROGRESS), // PUBLISHED -> IN_PROGRESS
                 Status.IN_PROGRESS, List.of(Status.PROCESSED, Status.BLOCKED), // IN_PROGRESS -> PROCESSED or BLOCKED
@@ -256,5 +287,9 @@ public class IncidentServiceImpl implements IIncidentService {
             return fileName.substring(fileName.lastIndexOf(".") + 1);
         }
         return "";
+    }
+
+    private String getFileNameFromPath(String filePath) {
+        return Paths.get(filePath).getFileName().toString();
     }
 }

@@ -16,7 +16,6 @@ import java.util.Date;
 @Data
 public class IncidentUpdateDTO {
     private Long id;
-    private Date updatedAt;
     private String description;
     private TypeDTO typeDTO;
     private SectorDTO sectorDTO;

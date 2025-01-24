@@ -1,5 +1,6 @@
 package ma.bonmyd.backendincident.repositories.incident;
 
+import ma.bonmyd.backendincident.dtos.incident.IncidentStatusGroupDTO;
 import ma.bonmyd.backendincident.entities.incident.Incident;
 import ma.bonmyd.backendincident.enums.Status;
 import org.springframework.data.domain.Page;
@@ -16,12 +17,8 @@ import java.util.List;
 public interface IncidentRepository extends JpaRepository<Incident, Long>, JpaSpecificationExecutor<Incident> {
     List<Incident> findByCitizenImei(String imei);
 
-    @Query("SELECT i from Incident  i where i.sector.id=:sectorId and i.status in :statuses")
-    List<Incident> findBySectorNameAndStatuses(@Param("sectorId") Long sectorId, @Param("statuses") List<Status> statuses);
-
-    @Query("SELECT i from Incident i where i.sector.id=:sectorId and i.status in :statuses")
-    Page<Incident> findBySectorNameAndStatuses(@Param("sectorId") Long sectorId, @Param("statuses") List<Status> statuses, Pageable pageable);
-
-
-    Page<Incident> findByStatus(Status status, Pageable pageable);
+    @Query("SELECT new ma.bonmyd.backendincident.dtos.incident.IncidentStatusGroupDTO(i.status, COUNT(i)) " +
+            "FROM Incident i " +
+            "GROUP BY i.status")
+    List<IncidentStatusGroupDTO> findIncidentsGroupedByStatus();
 }

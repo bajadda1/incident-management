@@ -1,11 +1,13 @@
 package ma.bonmyd.backendincident.mappers.impl;
 
 import ma.bonmyd.backendincident.dtos.incident.IncidentDTO;
+import ma.bonmyd.backendincident.dtos.incident.RejectionDTO;
 import ma.bonmyd.backendincident.dtos.incident.SectorDTO;
 import ma.bonmyd.backendincident.dtos.incident.TypeDTO;
 import ma.bonmyd.backendincident.dtos.territoriale.ProvinceDTO;
 import ma.bonmyd.backendincident.dtos.users.CitizenDTO;
 import ma.bonmyd.backendincident.entities.incident.Incident;
+import ma.bonmyd.backendincident.entities.incident.Rejection;
 import ma.bonmyd.backendincident.entities.incident.Sector;
 import ma.bonmyd.backendincident.entities.incident.Type;
 import ma.bonmyd.backendincident.entities.territoriale.Province;
@@ -30,13 +32,15 @@ public class IncidentDTOModelMapperImpl implements IModelMapper<Incident, Incide
     private final IModelMapper<Type, TypeDTO> typeModelMapper;
     private final IModelMapper<Sector, SectorDTO> sectorModelMapper;
     private final IModelMapper<Province, ProvinceDTO> provinceModelMapper;
+    private final IModelMapper<Rejection, RejectionDTO> rejectionModelMapper;
 
     @Autowired
-    public IncidentDTOModelMapperImpl(ModelMapper modelMapper, IModelMapper<Type, TypeDTO> typeModelMapper, IModelMapper<Sector, SectorDTO> sectorModelMapper, IModelMapper<Province, ProvinceDTO> provinceModelMapper) {
+    public IncidentDTOModelMapperImpl(ModelMapper modelMapper, IModelMapper<Type, TypeDTO> typeModelMapper, IModelMapper<Sector, SectorDTO> sectorModelMapper, IModelMapper<Province, ProvinceDTO> provinceModelMapper, IModelMapper<Rejection, RejectionDTO> rejectionModelMapper) {
         this.modelMapper = modelMapper;
         this.typeModelMapper = typeModelMapper;
         this.sectorModelMapper = sectorModelMapper;
         this.provinceModelMapper = provinceModelMapper;
+        this.rejectionModelMapper = rejectionModelMapper;
         this.modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setPropertyCondition(Conditions.isNotNull());
@@ -48,6 +52,11 @@ public class IncidentDTOModelMapperImpl implements IModelMapper<Incident, Incide
         Type type = entity.getType();
         Sector sector = entity.getSector();
         Province province = entity.getProvince();
+        List<Rejection> rejections = entity.getRejections();
+
+        Rejection rejection = (rejections != null && !rejections.isEmpty()) ? rejections.get(0) : null;
+
+        RejectionDTO rejectionDTO = this.rejectionModelMapper.convertToDto(rejection, RejectionDTO.class);
         IncidentDTO incidentDTO = this.modelMapper.map(entity, dtoClass);
         TypeDTO typeDTO = this.typeModelMapper.convertToDto(type, TypeDTO.class);
         SectorDTO sectorDTO = this.sectorModelMapper.convertToDto(sector, SectorDTO.class);
@@ -55,6 +64,7 @@ public class IncidentDTOModelMapperImpl implements IModelMapper<Incident, Incide
         incidentDTO.setSectorDTO(sectorDTO);
         incidentDTO.setTypeDTO(typeDTO);
         incidentDTO.setProvinceDTO(provinceDTO);
+        incidentDTO.setRejectionDTO(rejectionDTO);
         return incidentDTO;
     }
 

@@ -55,6 +55,7 @@ public class Incident {
     private Status status;
 
     @OneToMany(mappedBy = "incident",cascade = CascadeType.ALL)
+    @OrderBy("date ASC")
     private List<Rejection> rejections;
     // WKT-based getter and setter for location
     public String getLocation() {
