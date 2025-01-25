@@ -46,4 +46,19 @@ public class IncidentSpecification {
     public static Specification<Incident> hasCitizenImei(String imei) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("citizen").get("imei"), imei);
     }
+
+    public static Specification<Incident> hasDateBetween(Date startDate, Date endDate) {
+        return (root, query, criteriaBuilder) -> {
+            if (startDate != null && endDate != null) {
+                return criteriaBuilder.between(root.get("createdAt"), startDate, endDate);
+            } else if (startDate != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
+            } else if (endDate != null) {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate);
+            } else {
+                return null; // No filter applied
+            }
+        };
+    }
+
 }

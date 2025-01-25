@@ -65,6 +65,9 @@ public class SecurityConfig {
     @Value("${user.api}")
     private String userApi;
 
+    @Value("${stats.api}")
+    private String statsApi;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
@@ -88,6 +91,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(authApi + "/login").permitAll()
                                 .requestMatchers(authApi + "/register").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                .requestMatchers(statsApi + "/**").permitAll()
 
                                 .requestMatchers(HttpMethod.GET, sectorApi + "/**").permitAll()
 

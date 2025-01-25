@@ -37,6 +37,15 @@ public interface IIncidentService {
                                                                    Date date,
                                                                    int page, int size);
 
+    List<IncidentDTO> getAllFilteredIncidents(Status status,
+                                              Long provinceId,
+                                              Long regionId,
+                                              Long sectorId,
+                                              Long typeId,
+                                              String description,
+                                              Date startDate,
+                                              Date endDate);
+
     ApiResponseGenericPagination<IncidentDTO> getFilteredIncidentsByProfessional(Status status,
                                                                                  Long provinceId,
                                                                                  Long regionId,
@@ -57,5 +66,7 @@ public interface IIncidentService {
                                                                             Date date,
                                                                             int page, int size);
 
+
+    List<IncidentStatusGroupDTO> getIncidentsGroupedByStatus();
 
 }

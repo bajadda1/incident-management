@@ -16,6 +16,7 @@ import ma.bonmyd.backendincident.services.incident.IIncidentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -150,5 +151,19 @@ public class IncidentRestController {
             @RequestParam(name = "page", defaultValue = "${default.current.page}") int page,
             @RequestParam(name = "size", defaultValue = "${default.page.size}") int size) {
         return incidentService.getFilteredIncidentsByCitizen(imei, status, provinceId, regionId, sectorId, typeId, description, date, page, size);
+    }
+
+
+    @GetMapping()
+    public List<IncidentDTO> getAllIncidents(
+            @RequestParam(name = "status", required = false) Status status,
+            @RequestParam(name = "province", required = false) Long provinceId,
+            @RequestParam(name = "region", required = false) Long regionId,
+            @RequestParam(name = "sector", required = false) Long sectorId,
+            @RequestParam(name = "type", required = false) Long typeId,
+            @RequestParam(name = "description", required = false) String description,
+            @RequestParam(name = "start-date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam(name = "end-date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        return incidentService.getAllFilteredIncidents(status, provinceId, regionId, sectorId, typeId, description, startDate, endDate);
     }
 }

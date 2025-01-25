@@ -26,4 +26,13 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> (username != null && !username.isEmpty()) ? criteriaBuilder.like(root.get("username"), "%" + username + "%") : null;
     }
 
+    // ||==|> email !
+    public static Specification<User> countDistinctSectors() {
+        return (root, query, criteriaBuilder) -> {
+            criteriaBuilder.countDistinct(root.get("sector"));
+            return null;
+        };
+
+    }
+
 }
