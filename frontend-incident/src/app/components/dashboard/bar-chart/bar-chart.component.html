@@ -1,0 +1,140 @@
+<div class="w-full bg-zinc-100">
+  <!--  <h2 class="font-extrabold mb-3 w-1/2">Incident Status Distribution :</h2>-->
+
+  <div class="bg-gray-200 shadow p-4">
+    <div class="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+      <!-- Filter Regions Dropdown -->
+      <div class="w-full">
+        <label class="block mb-1 text-sm font-medium text-gray-700">
+          Region:
+        </label>
+        <div class="relative">
+          <select
+            [(ngModel)]="selectedRegion"
+            (change)="fetchGroupedByStatus()"
+            class="w-full bg-white text-gray-800 text-sm border border-gray-300 pl-3 pr-8 h-10 shadow-sm focus:ring-green-500 focus:border-green-500 hover:border-green-500 transition duration-200 cursor-pointer appearance-none"
+            style="-webkit-appearance: none;">
+            <option [ngValue]="null">ALL</option>
+            <option *ngFor="let region of regions" [value]="region.id">{{ region.name }}</option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="absolute right-3 top-2.5 h-5 w-5 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Filter Sector Dropdown (Visible to Admin Only) -->
+      <div class="w-full">
+        <label class="block mb-1 text-sm font-medium text-gray-700">
+          Sector:
+        </label>
+        <div class="relative">
+          <select
+            [(ngModel)]="selectedSector"
+            (change)="onSectorChange()"
+            class="w-full bg-white text-gray-800 text-sm border border-gray-300 pl-3 pr-8 h-10 shadow-sm focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition duration-200 cursor-pointer appearance-none"
+            style="-webkit-appearance: none;">
+            <option [ngValue]="null">ALL</option>
+            <option *ngFor="let sector of sectors" [ngValue]="sector.id">{{ sector.name }}</option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="absolute right-3 top-2.5 h-5 w-5 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Filter Types Dropdown -->
+      <div class="w-full">
+        <label class="block mb-1 text-sm font-medium text-gray-700">
+          Type:
+        </label>
+        <div class="relative">
+          <select
+            [(ngModel)]="selectedType"
+            (change)="fetchGroupedByStatus()"
+            class="w-full bg-white text-gray-800 text-sm border border-gray-300 pl-3 pr-8 h-10 shadow-sm focus:ring-green-500 focus:border-green-500 hover:border-green-500 transition duration-200 cursor-pointer appearance-none"
+            style="-webkit-appearance: none;">
+            <option [ngValue]="null">ALL</option>
+            <option *ngFor="let type of filteredTypes" [value]="type.id">{{ type.name }}</option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="absolute right-3 top-2.5 h-5 w-5 text-gray-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Filter Start Date -->
+      <div class="w-full">
+        <label class="block mb-1 text-sm font-medium text-gray-700">
+          Start Date:
+        </label>
+        <div class="relative">
+          <input
+            type="date"
+            [(ngModel)]="selectedStartDate"
+            (change)="fetchGroupedByStatus()"
+            class="w-full bg-white text-gray-800 text-sm border border-gray-300 pl-3 h-10 shadow-sm focus:ring-green-500 focus:border-green-500 hover:border-green-500 transition duration-200 cursor-pointer">
+        </div>
+      </div>
+
+      <!-- Filter End Date -->
+      <div class="w-full">
+        <label class="block mb-1 text-sm font-medium text-gray-700">
+          End Date:
+        </label>
+        <div class="relative">
+          <input
+            type="date"
+            [(ngModel)]="selectedEndDate"
+            (change)="fetchGroupedByStatus()"
+            class="w-full bg-white text-gray-800 text-sm border border-gray-300 pl-3 h-10 shadow-sm focus:ring-green-500 focus:border-green-500 hover:border-green-500 transition duration-200 cursor-pointer">
+        </div>
+      </div>
+
+      <!-- Add Reset Button -->
+      <!-- Add Reset Button -->
+      <div class="flex justify-center items-center absolute -right-4 -top-4 w-fit bg-black">
+        <button type="button"
+                (click)="resetFilters()"
+                class="p-2 flex items-center justify-center text-white text-sm tracking-wider font-medium border-none outline-none bg-red-600 hover:bg-red-700 active:bg-red-600  shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12px" fill="currentColor" class="inline"
+               viewBox="0 0 320.591 320.591">
+            <path
+              d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"
+              data-original="#000000"/>
+            <path
+              d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"
+              data-original="#000000"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="px-2 w-full h-fit grid grid-cols-1 place-items-center">
+
+    <div class="w-2/3 h-fit">
+      <canvas
+        class="w-full"
+        #barChart
+        baseChart
+        [data]="barChartData"
+        [labels]="barChartData.labels"
+        [options]="barChartOptions"
+        [type]="barChartType">
+      </canvas>
+    </div>
+
+
+  </div>
+
+</div>

@@ -1,0 +1,308 @@
+<div class="flex flex-col md:flex-row h-screen relative">
+
+
+  <!-- Modal -->
+  <div
+    data-twe-modal-init
+    class="absolute inset-0 z-[2000] hidden bg-black w-full h-full bg-opacity-50 p-4 overflow-y-auto overflow-x-hidden outline-none"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="w-full h-full grid place-items-center">
+      <div
+        data-twe-modal-dialog-ref
+        class="relative w-full max-w-md mx-auto bg-white rounded-md shadow-lg">
+        <!-- Modal Content -->
+        <div
+          class="relative flex flex-col rounded-md bg-white shadow-lg outline-none">
+          <!-- Modal Header -->
+          <div
+            class="flex items-center justify-between rounded-t-md border-b border-neutral-100 p-4">
+            <h5
+              class="text-xl font-bold text-gray-800"
+              id="exampleModalLabel">
+              Update Incident Status
+            </h5>
+            <button
+              type="button"
+              class="text-gray-500 hover:text-gray-800 focus:outline-none"
+              data-twe-modal-dismiss
+              aria-label="Close">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Body -->
+          <div
+            class="">
+            <div class="w-full max-w-md bg-white  rounded-lg p-6 relative">
+
+              <div class="my-8 text-center">
+                <i
+                  *ngIf="chosenStatusForUpdating != Status.REJECTED"
+                  class="fa-solid fa-check-double text-2xl text-green-500"></i>
+                <i
+                  *ngIf="chosenStatusForUpdating == Status.REJECTED"
+                  class="fa-solid fa-handshake-slash text-2xl text-red-500">
+
+                </i>
+                <h4 class="text-gray-800 text-lg font-semibold mt-4">Are you sure you want
+                  to <span
+                    class="font-bold"
+                    [ngClass]="chosenStatusForUpdating != Status.REJECTED?'text-green-500':'text-red-500'"
+                  >{{ chosenStatusForUpdating }}</span> it?</h4>
+              </div>
+              <div *ngIf="chosenStatusForUpdating == Status.REJECTED">
+                <div class="relative w-full min-w-[200px]">
+                  <textarea
+                    [(ngModel)]="rejectionReason"
+                    class="peer h-full min-h-[100px] w-full resize-none rounded-[7px] border border-gray-500  bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-red-500 focus:border-t-transparent focus:outline-0 disabled:resize-none disabled:border-0 disabled:bg-blue-gray-50"
+                    placeholder=" "
+                    required></textarea>
+                  <label
+                    class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-xl font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-red-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-red-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-red-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                    Rejection Reason *
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Modal Footer -->
+          <div class="flex flex-col items-center gap-2 border-t border-neutral-100 p-4">
+
+            <button
+              (click)="confirmUpdateStatus()"
+              type="button"
+              data-twe-modal-dismiss
+              class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none">
+              Confirm
+
+            </button>
+            <button
+              type="button"
+              class="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none"
+              data-twe-modal-dismiss
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Section -->
+  <div class="h-full md:w-1/2 relative">
+    <div id="map" class="z-[1000] absolute inset-0 shadow-lg border md:rounded-l-lg"></div>
+  </div>
+
+  <!-- Incident Details Section -->
+  <div
+    class="relative w-full md:w-1/2 p-6 bg-gray-100 flex flex-col justify-center items-center shadow-lg">
+
+    <!--    error message-->
+    <div
+      *ngIf="errorMsg"
+      class="absolute w-[80%]  top-4 right-1/2 translate-x-1/2  bg-white flex  text-red-600 border border-red-500 rounded-lg overflow-hidden "
+      role="alert">
+      <div class="bg-red-500 w-16 shrink-0 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 fill-white" viewBox="0 0 32 32">
+          <path
+            d="M16 1a15 15 0 1 0 15 15A15 15 0 0 0 16 1zm6.36 20L21 22.36l-5-4.95-4.95 4.95L9.64 21l4.95-5-4.95-4.95 1.41-1.41L16 14.59l5-4.95 1.41 1.41-5 4.95z"
+            data-original="#ea2d3f"/>
+        </svg>
+      </div>
+
+      <div class="flex flex-col justify-center px-4 py-1">
+        <p class="font-bold text-sm mr-4 mb-0.5">Error Message!</p>
+        <span class="text-sm">
+                    {{ errorMsg }}
+        </span>
+      </div>
+
+      <svg
+        (click)="errorMsg=''"
+        xmlns="http://www.w3.org/2000/svg" class="w-3 cursor-pointer fill-red-500 absolute right-4 top-3"
+        viewBox="0 0 320.591 320.591">
+        <path
+          d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"
+          data-original="#000000"/>
+        <path
+          d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"
+          data-original="#000000"/>
+      </svg>
+    </div>
+
+
+    <h2 class="text-3xl font-extrabold text-gray-800 mb-6">Incident Details</h2>
+    <div class="bg-white rounded-lg shadow-md p-6 w-full max-w-lg relative">
+      <div class="absolute top-1 right-1 w-28 h-28 shadow"
+           *ngIf="incident.photo">
+        <img
+          class="w-full h-full object-contain cursor-pointer"
+          [src]="incident.photo"
+          (click)="openLightbox()"
+          alt="Incident Photo"
+
+        >
+      </div>
+      <ng-container *ngIf="incident">
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i
+              class="fas fa-info-circle mr-2 text-blue-500"></i><strong>Description:</strong> {{ incident.description }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-check-circle mr-2 text-green-500"></i><strong>Status:</strong> {{ incident.status }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-tags mr-2 text-yellow-500"></i><strong>Type:</strong> {{ incident.typeDTO.name }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-industry mr-2 text-indigo-500"></i><strong>Sector:</strong> {{ incident.sectorDTO.name }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-map-marker-alt mr-2 text-red-500"></i><strong>Location:</strong> {{ incident.location }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-calendar-alt mr-2 text-purple-500"></i><strong>Created
+            At:</strong> {{ incident.createdAt | date: 'short' }}
+          </p>
+        </div>
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-edit mr-2 text-teal-500"></i><strong>Updated
+            At:</strong> {{ incident.updatedAt | date: 'short' }}
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fas fa-map-location mr-2 text-teal-500"></i><strong>Province
+            :</strong> {{ incident.provinceDTO.name }}
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fa-solid fa-earth-americas mr-2 text-red-500"></i>
+            <strong>Region
+              :</strong> {{ incident.provinceDTO.regionDTO.name }}
+          </p>
+        </div>
+
+        <div *ngIf="incident.rejectionDTO"
+             class="">
+          <hr>
+          <p class="text-gray-600 font-medium text-lg">
+            <i class="fa-solid fa-ban mr-2 text-red-500"></i>
+            <strong>Rejection
+              :</strong> {{ incident.rejectionDTO?.reason }}
+          </p>
+        </div>
+
+        <div class="grid place-items-center mt-6">
+          <!--                    <button-->
+          <!--                      type="button"-->
+          <!--                      class="inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-blue-700 focus:outline-none"-->
+          <!--                      data-twe-toggle="modal"-->
+          <!--                      data-twe-target="#exampleModal"-->
+          <!--                      data-twe-ripple-init-->
+          <!--                      data-twe-ripple-color="light"-->
+          <!--                      *ngIf="canBeUpdated"-->
+          <!--                    >-->
+          <!--                      Update-->
+          <!--                    </button>-->
+
+          <div
+            *ngIf="canBeUpdated"
+            class="font-[sans-serif] w-max mx-auto bg-gray-200 border divide-x divide-white flex rounded overflow-hidden">
+            <!--            <div *ngIf="isAdmin">-->
+            <!--              <button type="button"-->
+            <!--                      data-twe-toggle="modal"-->
+            <!--                      data-twe-target="#exampleModal"-->
+            <!--                      data-twe-ripple-init-->
+            <!--                      data-twe-ripple-color="light"-->
+            <!--                      (click)="chosenStatusForUpdating = AdminStatus.REJECTED"-->
+            <!--                      class="px-5 py-2.5 flex items-center  text-sm outline-none text-red-500 hover:bg-gray-300 transition-all">-->
+            <!--                <i class="fa-solid fa-handshake-slash mr-2"></i>-->
+            <!--                Reject-->
+            <!--              </button>-->
+            <!--              <button type="button"-->
+
+            <!--                      data-twe-toggle="modal"-->
+            <!--                      data-twe-target="#exampleModal"-->
+            <!--                      data-twe-ripple-init-->
+            <!--                      data-twe-ripple-color="light"-->
+            <!--                      (click)="chosenStatusForUpdating = AdminStatus.PUBLISHED"-->
+            <!--                      class="px-5 py-2.5 flex items-center text-green-500 text-sm outline-none hover:bg-gray-300 transition-all">-->
+            <!--                <i class="fa-solid fa-check-double mr-2"></i>-->
+            <!--                Publish-->
+            <!--              </button>-->
+            <!--            </div>-->
+
+            <div>
+
+              <div
+                class="font-[sans-serif] w-max mx-auto bg-gray-200 border divide-x divide-white flex rounded overflow-hidden">
+
+                <button type="button"
+                        *ngFor="let status of professionalAcceptedStatus"
+                        class="px-5 py-2.5 flex items-center text-[#333] text-sm outline-none transition-all"
+                        [ngClass]="statusClasses[status]"
+                        data-twe-toggle="modal"
+                        data-twe-target="#exampleModal"
+                        data-twe-ripple-init
+                        data-twe-ripple-color="light"
+                        (click)="chosenStatusForUpdating = status"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17px" fill="currentColor" class="mr-2"
+                       viewBox="0 0 24 24">
+                    <path
+                      d="m20 8.6-8.38 8.38c-.29.29-.67.47-1.08.51l-2.93.27H7.5c-.33 0-.65-.13-.88-.37-.26-.26-.39-.63-.36-1l.27-2.93c.04-.41.22-.79.51-1.08L15.4 4zm1.94-5.83-.71-.71a2.758 2.758 0 0 0-3.89 0l-.88.88 4.6 4.6.88-.88a2.732 2.732 0 0 0 0-3.88zm-1.19 16.24V13.2c0-.41-.34-.75-.75-.75s-.75.34-.75.75v5.81c0 1.24-1.01 2.25-2.25 2.25H5c-1.24 0-2.25-1.01-2.25-2.25V7c0-1.24 1.01-2.25 2.25-2.25h5.81c.41 0 .75-.34.75-.75s-.34-.75-.75-.75H5C2.93 3.25 1.25 4.93 1.25 7v12c0 2.07 1.68 3.75 3.75 3.75h12c2.07 0 3.75-1.68 3.75-3.75z"
+                      data-original="#000000"/>
+                  </svg>
+                  {{ status }}
+                </button>
+
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+

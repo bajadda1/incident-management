@@ -1,0 +1,15 @@
+
+
+<div class="relative">
+  <app-nav-bar></app-nav-bar>
+  <app-spinner></app-spinner>
+
+  <div class="relative"
+       [ngClass]="{'lg:px-20':!hideNavAndFooter}">
+    <router-outlet></router-outlet>
+  </div>
+
+  <app-footer></app-footer>
+</div>
+
+
